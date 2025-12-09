@@ -13,7 +13,7 @@ use core::fmt;
 use core::result::Result;
 
 use embedded_hal::{
-    blocking::spi::{Transfer, Write},
+    spi::{Transfer, Write},
     digital::v2::OutputPin,
     spi::{Mode, Phase, Polarity},
 };
