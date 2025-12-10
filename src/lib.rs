@@ -4,13 +4,16 @@
 //!
 //! [`embedded-hal`]: https://docs.rs/embedded-hal/1.0
 //!
-#![no_std]
+#![cfg_attr(not(feature = "std"), no_std)]
 #![allow(dead_code)]
 #![deny(missing_docs)]
 #![deny(warnings)]
 
 use core::fmt;
 use core::result::Result;
+
+#[cfg(feature = "std")]
+use std::error::Error as StdError;
 
 use embedded_hal::{
     digital::OutputPin,
@@ -43,6 +46,23 @@ pub enum Error<E> {
     /// Pin error (EN pin)
     PinError,
 }
+
+// Implement Display using core::fmt
+impl<E: fmt::Display> fmt::Display for Error<E> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Error::Spi(e) => write!(f, "SPI error: {e}"),
+            Error::PinError => write!(f, "Pin error"),
+        }
+    }
+}
+
+// Only when std is available, also implement std::error::Error
+#[cfg(feature = "std")]
+impl<E> StdError for Error<E>
+where
+    E: StdError + 'static,
+{}
 
 /// Data Exchange packet
 pub struct DataPacket {

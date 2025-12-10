@@ -16,10 +16,14 @@ license = "Apache-2.0"
 
 [dependencies]
 modular-bitfield = "0.13.1"
-modular-bitfield-to-value = { version = "*", git = "https://github.com/hacknus/modular-bitfield-to-value"}
+modular-bitfield-to-value = { git = "https://github.com/sebastianbergt/modular-bitfield-to-value" }
 
 [dependencies.embedded-hal]
 version = "1.0.0"
+
+[features]
+default = []
+std = []
 
 [profile.dev]
 incremental = false
