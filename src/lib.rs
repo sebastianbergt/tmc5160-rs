@@ -306,6 +306,12 @@ where
         self.write_register(Registers::GCONF, &mut value)
     }
 
+        /// write value to G_CONF register
+    pub fn update_short_conf(&mut self) -> Result<DataPacket, Error<E>> {
+        let mut value = swap_bytes(self.short_conf.into_bytes());
+        self.write_register(Registers::SHORT_CONF, &mut value)
+    }
+
     /// write value to CHOP_CONF register
     pub fn update_chop_conf(&mut self) -> Result<DataPacket, Error<E>> {
         let mut value = swap_bytes(self.chop_conf.into_bytes());
