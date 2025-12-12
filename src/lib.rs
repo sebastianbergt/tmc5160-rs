@@ -59,10 +59,7 @@ impl<E: fmt::Display> fmt::Display for Error<E> {
 
 // Only when std is available, also implement std::error::Error
 #[cfg(feature = "std")]
-impl<E> StdError for Error<E>
-where
-    E: StdError + 'static,
-{}
+impl<E> StdError for Error<E> where E: StdError + 'static {}
 
 /// Data Exchange packet
 pub struct DataPacket {
