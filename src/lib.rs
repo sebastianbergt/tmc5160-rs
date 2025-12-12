@@ -213,15 +213,10 @@ where
 
         let response = buffer;
 
-        let mut ret_val: [u8; 4] = [0; 4];
-        for i in 0..4 {
-            ret_val[i] = response[i + 1];
-        }
+        let mut ret_val = [0u8; 4];
+        ret_val.copy_from_slice(&buffer[1..5]);
 
-        let mut debug_val: [u8; 5] = [0; 5];
-        for i in 0..5 {
-            debug_val[i] = response[i];
-        }
+        let debug_val = response.clone();
 
         Ok(DataPacket {
             status: SpiStatus::from_bytes([response[0]]),
