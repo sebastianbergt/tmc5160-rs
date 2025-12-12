@@ -17,7 +17,7 @@ use std::error::Error as StdError;
 
 use embedded_hal::{
     digital::OutputPin,
-    spi::{Mode, Phase, Polarity, SpiDevice},
+    spi::{Mode, Phase, Polarity, SpiBus},
 };
 
 use crate::registers::*;
@@ -81,8 +81,9 @@ impl fmt::Display for DataPacket {
 }
 
 /// TMC5160 driver
-pub struct Tmc5160<SPI, EN> {
+pub struct Tmc5160<SPI, CS, EN> {
     spi: SPI,
+    cs: CS,
     en: Option<EN>,
     /// the max velocity that is set
     pub v_max: f32,
@@ -119,15 +120,17 @@ pub struct Tmc5160<SPI, EN> {
     pub pwm_conf: PwmConf,
 }
 
-impl<SPI, EN, E> Tmc5160<SPI, EN>
+impl<SPI, CS, EN, E> Tmc5160<SPI, CS, EN>
 where
-    SPI: SpiDevice<Error = E>,
+    SPI: SpiBus<Error = E>,
+    CS: OutputPin,
     EN: OutputPin,
 {
     /// Create a new driver from a SPI device.
-    pub fn new(spi: SPI) -> Self {
+    pub fn new(spi: SPI, cs: CS) -> Self {
         Tmc5160 {
             spi,
+            cs,
             en: None,
             v_max: 0.0,
             status: SpiStatus::new(),
@@ -200,12 +203,16 @@ where
     where
         T: Address + Copy,
     {
+        self.cs.set_low().ok();
+
         let mut buffer = [reg.addr(), 0, 0, 0, 0];
 
         // SpiDevice handles CS assertion/deassertion internally
         self.spi
             .transfer_in_place(&mut buffer)
             .map_err(Error::Spi)?;
+
+        self.cs.set_high().ok();
 
         let response = buffer;
 
@@ -231,6 +238,8 @@ where
     where
         T: Address + Copy,
     {
+        self.cs.set_low().ok();
+
         let mut buffer = [reg.addr() | 0x80, val[0], val[1], val[2], val[3]];
 
         let debug_val = buffer;
@@ -238,6 +247,8 @@ where
         self.spi
             .transfer_in_place(&mut buffer)
             .map_err(Error::Spi)?;
+
+        self.cs.set_high().ok();
 
         let response = buffer;
 
