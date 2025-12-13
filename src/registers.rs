@@ -541,7 +541,7 @@ impl Default for PwmConf {
 pub struct PwmScale {
     pub pwm_scale_sum: u8,
     #[skip] __: B8,
-    pub pwm_scale_auto_sign: B1,
+    pub pwm_scale_auto_sign: bool,
     pub pwm_scale_auto: u8,
     #[skip] __: B7,
 }
