@@ -532,3 +532,28 @@ impl Default for PwmConf {
         Self::from_bytes(0xC40C001E_u32.to_le_bytes())
     }
 }
+
+/// PWM_SCALE Register
+#[derive(Clone, Copy)]
+#[allow(dead_code)]
+#[bitfield(bits = 32)]
+#[derive(ToValue)]
+pub struct PwmScale {
+    pub pwm_scale_sum: u8,
+    #[skip] __: B8,
+    pub pwm_scale_auto_sign: B1,
+    pub pwm_scale_auto: u8,
+    #[skip] __: B7,
+}
+
+/// PWM_AUTO Register
+#[derive(Clone, Copy)]
+#[allow(dead_code)]
+#[bitfield(bits = 32)]
+#[derive(ToValue)]
+pub struct PwmAuto {
+    pub pwm_ofs_auto: u8,
+    #[skip] __: B8,
+    pub pwm_grad_auto: u8,
+    #[skip] __: B8,
+}

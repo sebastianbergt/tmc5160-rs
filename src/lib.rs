@@ -614,4 +614,18 @@ where
         self.read_register(Registers::XTARGET)
             .map(|val| (val.data as i32) as f32 / self._step_count)
     }
+
+    /// read PwmScale register
+    pub fn read_pwm_scale(&mut self) -> Result<PwmScale, Error<E>> {
+        let packet = self.read_register(Registers::PWM_SCALE)?;
+        self.status = packet.status;
+        Ok(PwmScale::from_bytes(packet.data.to_le_bytes()))
+    }
+
+    /// read PwmScale register
+    pub fn read_pwm_auto(&mut self) -> Result<PwmAuto, Error<E>> {
+        let packet = self.read_register(Registers::PWM_AUTO)?;
+        self.status = packet.status;
+        Ok(PwmAuto::from_bytes(packet.data.to_le_bytes()))
+    }
 }
