@@ -11,7 +11,6 @@ pub trait Address {
     fn addr(self) -> u8;
 }
 
-
 /// Register addresses of the TMC5160
 #[derive(Debug, Copy, Clone)]
 #[allow(dead_code, non_camel_case_types)]
@@ -483,13 +482,6 @@ pub struct ChopConf {
     pub diss2vs: bool,
 }
 
-impl Default for ChopConf {
-    fn default() -> Self {
-        Self::from_bytes(0x10410150_u32.to_le_bytes())
-    }
-}
-
-
 /// COOLCONF Register
 #[derive(Clone, Copy)]
 #[allow(dead_code)]
@@ -525,12 +517,6 @@ pub struct PwmConf {
     #[skip] __: B2,
     pub pwm_reg: B4,
     pub pwm_lim: B4,
-}
-
-impl Default for PwmConf {
-    fn default() -> Self {
-        Self::from_bytes(0xC40C001E_u32.to_le_bytes())
-    }
 }
 
 /// PWM_SCALE Register
