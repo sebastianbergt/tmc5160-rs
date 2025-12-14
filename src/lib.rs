@@ -16,8 +16,7 @@ use core::result::Result;
 use std::error::Error as StdError;
 
 use embedded_hal::{
-    digital::OutputPin,
-    spi::{Mode, Phase, Polarity, SpiBus},
+    digital::OutputPin, spi::{Mode, Phase, Polarity, SpiBus}, delay::DelayNs
 };
 
 use crate::registers::*;
@@ -78,10 +77,11 @@ impl fmt::Display for DataPacket {
 }
 
 /// TMC5160 driver
-pub struct Tmc5160<SPI, CS, EN> {
+pub struct Tmc5160<SPI, CS, EN, DELAY> {
     spi: SPI,
     cs: CS,
     en: Option<EN>,
+    delay: DELAY,
     /// the max velocity that is set
     pub v_max: f32,
     /// status register of the driver
@@ -117,18 +117,20 @@ pub struct Tmc5160<SPI, CS, EN> {
     pub pwm_conf: PwmConf,
 }
 
-impl<SPI, CS, EN, E> Tmc5160<SPI, CS, EN>
+impl<SPI, CS, EN, DELAY, E> Tmc5160<SPI, CS, EN, DELAY>
 where
     SPI: SpiBus<Error = E>,
     CS: OutputPin,
     EN: OutputPin,
+    DELAY: DelayNs,
 {
     /// Create a new driver from a SPI device.
-    pub fn new(spi: SPI, cs: CS) -> Self {
+    pub fn new(spi: SPI, cs: CS, delay: DELAY) -> Self {
         Tmc5160 {
             spi,
             cs,
             en: None,
+            delay,
             v_max: 0.0,
             status: SpiStatus::new(),
             debug: [0; 5],
@@ -192,6 +194,10 @@ where
     {
         // Process cmd to read, return previous (dummy) state
         let _dummy = self.read_io(reg)?;
+
+        //Delay for the minimum CSN high time (2tclk + 10ns -> 176ns with the default 12MHz clock)
+        self.delay.delay_ns(2 * 1_000_000_000 / self._clock as u32 + 10);
+
         // Repeat cmd to read, return state
         self.read_io(reg)
     }
